@@ -1,0 +1,7 @@
+name = "SinkhornDistance"
+uuid = "f54f004e-2c00-11e9-0a58-b3616241d5b6"
+authors = ["Michael J. Curry <curry@cs.umd.edu>"]
+version = "0.1.0"
+
+[deps]
+LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
