@@ -1,5 +1,5 @@
 module SinkhornDistance
+using LinearAlgebra
 
-greet() = print("Hello World!")
-
+include("sinkhorn.jl")
 end # module
