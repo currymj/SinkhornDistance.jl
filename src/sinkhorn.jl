@@ -1,43 +1,55 @@
-function sinkhorn_plan(dist_mat, a, b; ϵ=1e-3, tol=1e-3)
+function sinkhorn_plan(dist_mat, a, b; ϵ=1e-3, rounds=2)
     # figure out types later
     # do we want to allow for a version of this with batches over a and b?
     K = exp.(-dist_mat / ϵ)
     hist_dim = size(K, 1)
     v = ones(hist_dim)
     u = a ./ (K * v)
-    v .= b ./ (K * u)
-    prev_u = ones(hist_dim)
+    v .= b ./ (K' * u)
 
-    iters = 0
-    # michiel stock's stopping criterion
-    while maximum(abs.(prev_u - u)) >= tol# switch this to test convergence instead
-        prev_u .= u
+    for iter=1:rounds
         u .= a ./ (K * v)
-        v .= b ./ (K * u)
-        iters = iters + 1
+        v .= b ./ (K' * u)
     end
-    println(iters)
     Diagonal(u) * K * Diagonal(v)
 end
 
-function sinkhorn_plan_log(dist_mat, a, b; ϵ=1e-3, tol=1e-3)
+function softmin(mat, ϵ; dims=1)
+    zbar = minimum(mat, dims=dims)
+    (zbar .- sum(exp.(-(mat .- zbar)/ϵ), dims=dims))[:]
+end
 
+#function sinkhorn_plan_softmin(dist_mat, a, b; ϵ=1e-3, rounds=1)
+    #hist_dim = size(dist_mat, 1)
+    #g = ones(hist_dim)
+    #f = ones(hist_dim)
+    #S = dist_mat .- f .- g'
+    #f .= softmin(S, ϵ, dims=2) .- f .+ ϵ*log.(a)
+    #S .= dist_mat .- f .- g'
+    #g .= softmin(S, ϵ, dims=1) .- g .+ ϵ*log.(b)
+    #S .= dist_mat .- f .- g'
+    #for iter=1:rounds
+        #f .= softmin(S, ϵ, dims=2) .- f .+ ϵ*log.(a)
+        #S .= dist_mat .- f .- g'
+        #g .= softmin(S, ϵ, dims=1) .- g .+ ϵ*log.(b)
+        #S .= dist_mat .- f .- g'
+    #end
+    #Diagonal(exp.(f ./ ϵ)) * exp.(-dist_mat / ϵ) * Diagonal(exp.(g ./ ϵ))
+#end
+
+function sinkhorn_plan_log(dist_mat, a, b; ϵ=1e-3, rounds=2)
     K = exp.(-dist_mat / ϵ)
     hist_dim = size(K, 1)
     g = ones(hist_dim)
     f = ϵ*log.(a) - ϵ*log.(K * exp.(g / ϵ))
     g .= ϵ*log.(b) - ϵ*log.(K' * exp.(f / ϵ))
-    prev_f = ones(hist_dim)
 
     iters = 0
 
-    while maximum(abs.(prev_f - f)) >= tol
-        prev_f .= f
-        f .= ϵ*log.(a) - ϵ*log.(K * exp.(g / ϵ))
-        g .= ϵ*log.(b) - ϵ*log.(K' * exp.(f / ϵ))
-        iters = iters + 1
+    for iter=1:rounds
+        f .= ϵ*( log.(a) - log.(K * exp.(g / ϵ)) )
+        g .= ϵ*( log.(b) - log.(K' * exp.(f / ϵ)) )
     end
-    println(iters)
 
     Diagonal(exp.(f ./ ϵ)) * K * Diagonal(exp.(g ./ ϵ))
 end
