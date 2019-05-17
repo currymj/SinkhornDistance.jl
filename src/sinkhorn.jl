@@ -1,17 +1,17 @@
-function sinkhorn_plan(dist_mat, a, b; ϵ=1e-3, rounds=2)
+function sinkhorn_plan(dist_mat, a, b; ϵ=1e-1, rounds=2)
     # figure out types later
     # do we want to allow for a version of this with batches over a and b?
     K = exp.(-dist_mat / ϵ)
     hist_dim = size(K, 1)
     v = ones(hist_dim)
     u = a ./ (K * v)
-    v .= b ./ (K' * u)
+    v = b ./ (K' * u)
 
     for iter=1:rounds
-        u .= a ./ (K * v)
-        v .= b ./ (K' * u)
+        u = a ./ (K * v)
+        v = b ./ (K' * u)
     end
-    Diagonal(u) * K * Diagonal(v)
+    u .* K .* v'
 end
 
 function softmin(mat, ϵ; dims=1)
@@ -37,19 +37,19 @@ end
     #Diagonal(exp.(f ./ ϵ)) * exp.(-dist_mat / ϵ) * Diagonal(exp.(g ./ ϵ))
 #end
 
-function sinkhorn_plan_log(dist_mat, a, b; ϵ=1e-3, rounds=2)
+function sinkhorn_plan_log(dist_mat, a, b; ϵ=1e-1, rounds=2)
     K = exp.(-dist_mat / ϵ)
     hist_dim = size(K, 1)
     g = ones(hist_dim)
     f = ϵ*log.(a) - ϵ*log.(K * exp.(g / ϵ))
-    g .= ϵ*log.(b) - ϵ*log.(K' * exp.(f / ϵ))
+    g = ϵ*log.(b) - ϵ*log.(K' * exp.(f / ϵ))
 
     iters = 0
 
     for iter=1:rounds
-        f .= ϵ*( log.(a) - log.(K * exp.(g / ϵ)) )
-        g .= ϵ*( log.(b) - log.(K' * exp.(f / ϵ)) )
+        f = ϵ*( log.(a) - log.(K * exp.(g / ϵ)) )
+        g = ϵ*( log.(b) - log.(K' * exp.(f / ϵ)) )
     end
 
-    Diagonal(exp.(f ./ ϵ)) * K * Diagonal(exp.(g ./ ϵ))
+    exp.(f ./ ϵ) .* K .* exp.(g ./ ϵ)'
 end
