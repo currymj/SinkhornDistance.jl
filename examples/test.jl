@@ -1,5 +1,4 @@
 using SinkhornDistance, LinearAlgebra, Plots
-using Distributions
 
 function example_data(n)
     distmat = zeros(n,n)

@@ -1,5 +1,6 @@
 using SinkhornDistance, LinearAlgebra, Plots
 using CuArrays
+using Flux
 
 function example_data(n)
     distmat = zeros(n,n)
@@ -20,3 +21,20 @@ a, b, distmat = cu.(example_data(30))
 standard_plan = sinkhorn_plan(distmat, a, b; ϵ=1e-2, rounds=4)
 
 log_plan = sinkhorn_plan_log(distmat, a, b; ϵ=1e-2, rounds=4)
+
+fmodel = Chain(Dense(10,128),
+        Dense(128,128),
+        Dense(128,100),
+        x->reshape(x, 10,10).^2,
+        x->x'*x) |> gpu
+
+a = rand(10) |> gpu
+a ./= sum(a)
+b = rand(10) |> gpu
+b ./= sum(b)
+randominput = rand(10) |> gpu
+distmat = fmodel(randominput)
+
+diffplan = sinkhorn_plan(distmat, a, b)
+
+resultloss = sum(distmat .* diffplan)
