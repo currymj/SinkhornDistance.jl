@@ -3,7 +3,8 @@ function sinkhorn_plan(dist_mat, a, b; ϵ=1e-1, rounds=2)
     # do we want to allow for a version of this with batches over a and b?
     K = exp.(-dist_mat / ϵ)
     hist_dim = size(K, 1)
-    v = ones(hist_dim)
+    v = copy(a)
+    v .= 1.0
     u = a ./ (K * v)
     v = b ./ (K' * u)
 
@@ -40,7 +41,8 @@ end
 function sinkhorn_plan_log(dist_mat, a, b; ϵ=1e-1, rounds=2)
     K = exp.(-dist_mat / ϵ)
     hist_dim = size(K, 1)
-    g = ones(hist_dim)
+    g = copy(a)
+    g .= 1.0
     f = ϵ*log.(a) - ϵ*log.(K * exp.(g / ϵ))
     g = ϵ*log.(b) - ϵ*log.(K' * exp.(f / ϵ))
 
