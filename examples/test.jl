@@ -19,6 +19,4 @@ end
 a, b, distmat = example_data(30)
 standard_plan = sinkhorn_plan(distmat, a, b; ϵ=1e-2, rounds=4)
 
-log_plan = sinkhorn_plan_log(distmat, a, b; ϵ=1e-2)
-
-s, _ = qr(rand(10,10))
+log_plan = sinkhorn_plan_log(distmat, a, b; ϵ=1e-2, rounds=4)
