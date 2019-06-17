@@ -10,3 +10,15 @@ Possible future improvements include:
 
 - convenience methods to directly compute the Sinkhorn distance as a single number
 - convenience methods using [Distances.jl](https://github.com/JuliaStats/Distances.jl) to create distance matrices for common ground costs (Euclidean/Wasserstein, 0-1/Total Variation, etc.)
+
+# relevant papers
+
+The implementations are taken from Ch. 4 of the excellent:
+
+Gabriel Peyré and Marco Cuturi. 2018. Computational Optimal Transport. arXiv:1803.00567 \[stat\] (March 2018). Retrieved October 31, 2018 from http://arxiv.org/abs/1803.00567
+
+The paper that introduced the use of the Sinkhorn algorithm for optimal transport is:
+
+Marco Cuturi. 2013. Sinkhorn distances: Lightspeed computation of optimal transport. In Advances in neural information processing systems, 2292–2300.
+
+
