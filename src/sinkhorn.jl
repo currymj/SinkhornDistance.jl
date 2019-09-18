@@ -2,7 +2,7 @@ function sinkhorn_plan(dist_mat, a, b; ϵ=1e-1, rounds=2)
     # figure out types later
     # do we want to allow for a version of this with batches over a and b?
     K = exp.(-dist_mat / ϵ)
-    v = one.(a)
+    v = one.(b)
     u = a ./ (K * v)
     v = b ./ (K' * u)
 
